@@ -1,8 +1,14 @@
-# Agent-Based Models for Tolerance Interventions and Interethnic Cooperation
+# Tolerance Intervention Research: Agent-Based Models for Interethnic Cooperation
 
 [![R](https://img.shields.io/badge/R-4.5.1-blue.svg)](https://www.r-project.org/)
-[![RSiena](https://img.shields.io/badge/RSiena-1.4.8-green.svg)](https://www.stats.ox.ac.uk/~snijders/siena/)
+[![RSiena](https://img.shields.io/badge/RSiena-1.4.7+-green.svg)](https://www.stats.ox.ac.uk/~snijders/siena/)
+[![ggplot2](https://img.shields.io/badge/ggplot2-4.0.0-purple.svg)](https://ggplot2.tidyverse.org/)
+[![targets](https://img.shields.io/badge/targets-pipeline-orange.svg)](https://books.ropensci.org/targets/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**PhD Dissertation Project | Utrecht University | Statistical Sociology**
+
+> *How can individual-level changes in tolerance from interventions spread and persist in social networks to increase sustained interethnic cooperation?*
 
 ## Overview
 

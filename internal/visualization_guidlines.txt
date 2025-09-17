@@ -1,0 +1,395 @@
+1) What changed in ggplot now (v4.0.0) — why it matters
+
+S7 under the hood. ggplot’s core objects moved from S3 → S7. For most users this just means stricter type checks and fewer weird silent failures; for extension authors it unlocks double-dispatch (e.g., update_ggplot()), making custom components cleaner and more powerful. Plan to modernize extension code over time. 
+Tidyverse
+
+Theme-driven defaults (“ink / paper / accent”). Complete themes can now set role-based style defaults that propagate to geoms (foreground vs background vs accent). This lets you encode consistent design intent without micromanaging every layer. 
+Tidyverse
+
+New stats & facet ergonomics. stat_manual() (quick custom stats without full extension boilerplate) and stat_connect() (stairstep / custom connectors) plus expanded facet_wrap() layout options and proportional spacing improvements. Useful for diagnostics, uncertainty bands, Kaplan–Meier-style steps, etc. 
+Tidyverse
+
+Boxplot / violin styling got serious. Median/whisker/staple and violin quantiles are now independently styleable (and quantiles are computed from input data via the stat, not the density). 
+Tidyverse
+
+3.5.0 guide overhaul is the base. Axes and legends were rewritten as extensible guides (ggproto), with richer styling & behaviors. Learn the new guide knobs; they’re the backbone of publication-grade labeling. 
+GitHub
++3
+Tidyverse
++3
+Tidyverse
++3
+
+2) Best-practice guidelines for academic-grade plots (Hadley-inspired, field-tested)
+A. Encode truth cleanly (scales, uncertainty, comparisons)
+
+Prefer position & length encodings; avoid deceptive area/3D fluff. Use small multiples (facets) for comparisons; let guides carry meaning, not decoration. (Foundational in Wickham’s Grammar + ggplot2 book.) 
+ggplot2-book.org
+
+Uncertainty first-class. Use ggdist (slabs/intervals/eye plots) or tidybayes for posterior intervals, half-eyes, ridgelines—far better than naked SE bars. 
+CRAN
++1
+
+Color you can defend. Use viridis / scico (perceptually uniform; CVD-friendly). Okabe–Ito for qualitative sets. Build defaults into your theme. 
+ggplot2
++2
+CRAN
++2
+
+Avoid two color scales on the same aesthetic unless necessary; if you must, use ggnewscale (or ggh4x) and explain it in the caption. 
+Dan Oehm | Gradient Descending
++1
+
+B. Guides (axes/legends) as design levers, not afterthoughts
+
+Treat axes/legends as guides bound to scales; set them scale-by-scale with guide_*() or centrally with guides(). Tick placement, label formatting, and legend geometry are part of the argument. 
+ggplot2
+
+Use the 3.5+ guide system: custom axis breaks, minor ticks, legend key sizes, multi-row keys, etc., without hacks. (If older code tweaks guides via S3 methods, update to ggproto patterns.) 
+Tidyverse
++1
+
+C. Typography & rendering (the “looks professional” layer)
+
+Render with ragg for crisp, consistent anti-aliased output; use svglite for vector (journals, Illustrator/Inkscape edits). 
+Ragg
++1
+
+Use real fonts (showtext or systemfonts stack); set a larger base_size for print. Rich text (subtitles, facet labels) via ggtext; collision-free labels via ggrepel. 
+CRAN
++3
+CRAN
++3
+ggplot2-book.org
++3
+
+Export deliberately: pick width × height (in) and dpi, not “whatever the plot pane does.” Use ggsave() with units, dpi, and device chosen for the venue. 
+ggplot2
++1
+
+D. Layouts that argue your case
+
+Prefer small multiples over overplotted colors. Use facets (and with ggh4x when you need nested strips, unequal panel sizes, per-panel scales). Compose multi-panel figures with patchwork. 
+CRAN
++2
+CRAN
++2
+
+Animate only when time or state transitions carry meaning; gganimate for trajectories, agent states, or diffusion dynamics. Save with anim_save() when needed. 
+gganimate.com
++1
+
+E. Reproducibility & visual QA
+
+Manuscripts: Quarto manuscript projects (one source of truth for code, figs, refs). Pipelines: targets for dependency-aware rebuilds. Environments: renv to freeze packages. Visual tests: vdiffr for regression of figure appearance. 
+vdiffr.r-lib.org
++3
+Quarto
++3
+books.ropensci.org
++3
+
+3) Domain patterns
+Statistical sociology (models → plots that persuade)
+
+Marginal effects, not coefficients when the model is nonlinear or interactions matter. Use marginaleffects::plot_predictions() for conditional/average predictions with CIs; it returns ggplots you can facet by subgroups. 
+marginaleffects.com
++1
+
+For coefficient overviews, modelsummary::modelplot() builds clean estimate + CI plots (multi-model or single model). Pair with scico/viridis and careful ordering. 
+modelsummary.com
+
+For networked phenomena (ties, communities, flows), use ggraph/tidygraph: layouts, community highlighting, edge bundling, node/edge glyphs are all under the ggplot grammar. 
+rOpenSci
++1
+
+Longitudinal GOF/diagnostics in stochastic actor-oriented models (e.g., RSiena) benefit from small multiples and interval plots of simulated vs observed stats. (RSiena docs provide canonical GOF visualizations to emulate/extend.) 
+British Ecological Society Journals
+
+Agent-based models (ABM)
+
+State fields: use geom_raster()/geom_tile() for grids; animate with gganimate to show pattern formation over time. Trajectories: geom_path() with shadow_mark() to show trails. 
+gganimate.com
+
+Spatial ABM: integrate sf geometries with geom_sf() for context; thematic maps via tmap; switch to interactive inspection with leaflet as a complement, not a replacement, for final figures. 
+Oxford Stats
++2
+users.dimi.uniud.it
++2
+
+Workflow bridges: control NetLogo from R with nlrx; build native R agents with NetLogoR/abmR when appropriate; then plot with ggplot/ggraph. 
+r-spatial.github.io
++2
+r-tmap.github.io
++2
+
+4) A sane, modern ggplot figure recipe (drop-in)
+
+Design defaults (ink/paper/accent + accessible colors)
+
+library(ggplot2)
+library(ragg)        # device
+library(ggtext)      # rich text
+library(ggrepel)     # non-overlap labels
+library(viridisLite) # palettes
+
+# device for crisp raster output (PNG/TIFF); use svglite::svglite() for SVG
+agg_png("figure.png", width = 6, height = 4, units = "in", res = 320)
+
+p <- ggplot(df, aes(x, y, colour = group)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(se = TRUE, linewidth = 0.7) +
+  scale_colour_viridis_d(option = "D") +
+  labs(
+    title = "Outcome by group",
+    subtitle = "95% intervals; foreground/background via theme defaults",
+    x = "X", y = "Y"
+  ) +
+  theme_minimal(base_size = 11) +
+  # New v4 theme roles
+  theme(geom = element_geom(ink = "black", paper = "white", accent = "#3B528B")) +
+  theme(
+    plot.title.position = "plot",
+    legend.position = "right",
+    axis.title.x = element_text(margin = margin(t = 6)),
+    axis.title.y = element_text(margin = margin(r = 6)),
+    plot.subtitle = element_markdown()
+  )
+
+print(p); dev.off()
+
+
+This uses ragg for rendering, role-based theme defaults from 4.0.0, viridis color, legible typography, and guide-first axis spacing. Swap agg_png() for svglite::svglite("figure.svg", width=..., height=...) when journals require vector. 
+SVG Lite
++3
+Ragg
++3
+Tidyverse
++3
+
+5) Upgrade notes / pitfalls to watch
+
+Some inputs that used to “sort of work” now error (S7 validation). Fix types early (e.g., numeric vs character). 
+Tidyverse
+
+Boxplots: fatten deprecated; use median.linewidth et al. Violin quantiles: computed from data; turn on display via quantile.linetype. 
+Tidyverse
+
+If you extended guides pre-3.5, migrate to ggproto Guide classes. (Axes/legends are full citizens now.) 
+GitHub
+
+6) “Next-level” moves (when you need more)
+
+Legend engineering: exploit the modern guide system before hand-drawing keys; if you truly need exotic legends, legendry extends guide options neatly. 
+Tidyverse
++1
+
+Facets with structure: ggh4x for nested strips, per-facet scales, unequal panel sizing. Perfect for multi-level sociology/ABM experiments. 
+CRAN
+
+Figure composition: patchwork for journal multi-panel plates with tags and shared annotations. 
+CRAN
+
+7) Reproducible manuscript stack
+
+Quarto manuscripts keep narrative, code, figures, and refs unified; targets skips unchanged steps; renv freezes versions; vdiffr guards against accidental style drift. Build it once and ship everywhere. 
+vdiffr.r-lib.org
++3
+Quarto
++3
+CRAN
++3
+
+TL;DR checklist (pin this)
+
+Use ggplot 4.0.0; lean on ink/paper/accent in a complete theme. 
+Tidyverse
+
+Encode uncertainty (ggdist/tidybayes); prefer small multiples. 
+CRAN
++1
+
+Guides are your UI—tune axes/legends deliberately. 
+Tidyverse
++1
+
+ragg/svglite + showtext/ggtext/ggrepel for pro finish. 
+CRAN
++4
+Ragg
++4
+SVG Lite
++4
+
+viridis/scico/Okabe–Ito; no rainbow. 
+ggplot2
++2
+CRAN
++2
+
+For sociology: marginaleffects plots, modelsummary coef plots, ggraph for networks. 
+marginaleffects.com
++2
+modelsummary.com
++2
+
+For ABM: gganimate for dynamics; sf/tmap for space. 
+gganimate.com
++2
+Oxford Stats
++2
+
+Wrap it in Quarto + targets + renv + vdiffr. 
+vdiffr.r-lib.org
++3
+Quarto
++3
+books.ropensci.org
++3
+
+Wickham’s north star is the Grammar of Graphics: treat plots as declarative compositions of data → aesthetics → geometric marks, modulated by scales, stats, coordinates, facets, and themes. The newest ggplot2 4.0.0 cements that philosophy by modernising internals (S7 object system) and continuing the recent overhaul of the guide/legend/axis machinery, which expands extensibility without breaking the declarative API users write. For scientific work in statistical sociology and ABM, the current state-of-the-art in R is: ggplot2 for core grammars; ggdist/tidybayes for uncertainty; ggraph/tidygraph for networks; sf + tmap/leaflet for spatial ABMs; gganimate for dynamics; all wrapped in Quarto + targets for reproducible, publication-grade pipelines and vdiffr for visual regression testing. 
+GitHub
++4
+ggplot2
++4
+RDocumentation
++4
+
+Wickham’s visualization philosophy (essentials)
+
+Declarative, data-first grammar. You state what to map (variables → aesthetics) and what marks to use (geoms); ggplot computes how to draw them (stats, scales, coords). Prefer small multiples (facets) over visual spaghetti; keep encodings perceptually ordered; make uncertainty explicit via stats/scales. This is the layered grammar distilled from Wilkinson, formalised by Wickham. 
+ggplot2
++1
+
+Tidy design principles. Human-centered, consistent, composable components; learn once, reuse everywhere across the tidyverse. 
+GitHub
+
+Learning path codified. R4DS’s “Visualize” and “Communicate” set pragmatic defaults: map, facet, scale, theme, iterate. 
+ggplot2
+
+What’s new in ggplot2 (now 4.0.0)
+
+Major release (Sept 11, 2025). 4.0.0 is on CRAN; official post outlines the changes. Practically, it keeps the user API stable while upgrading internals to enable more powerful extensions. If you maintain extensions, read the release notes. 
+Tidyverse
++1
+
+S7 under the hood. 4.0.0 migrates large chunks of the S3 backend to S7, improving type safety and extensibility; 3.5.2 shipped scaffolding so downstreams could prepare. Pin versions in critical projects, test your stack, and update as needed. 
+R-bloggers
++1
+
+Guides/axes/legends are now truly extensible. The big 3.5.x rewrite made guides themeable and extension-friendly; 4.0.0 builds atop that. If you ship custom guides, re-test. 
+GitHub
+
+State of the art with R for statistical sociology
+
+Networks & relational data.
+Use tidygraph + ggraph for layouts, layering, and facets over time, not hairballs. Combine with ggrepel/ggtext for readable annotation. For model-based work (ERGM/TERGM/SAOM), keep model diagnostics separate from story figures. 
+packages.guix.gnu.org
++1
+
+Longitudinal network models (RSiena).
+RSiena provides GOF/diagnostic plots; treat them as evidence panels next to narrative plots (effects with intervals via ggdist). Follow the manual’s diagnostics and convergence checks before polishing visuals. 
+Quarto
+
+Uncertainty → first-class.
+ggdist (+ tidybayes) for intervals, slabs, CCDFs, and distribution geoms; prefer interval/half-eye/eye plots over naked point estimates. 
+RDocumentation
+
+Minimal pattern (network snapshots)
+library(ggraph); library(tidygraph); library(ggdist)
+graph %>% 
+  activate(nodes) %>% 
+  mutate(role = factor(role)) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link(alpha = .15) +
+  geom_node_point(aes(color = role, size = centrality)) +
+  facet_wrap(~ time) +
+  theme_minimal()
+
+
+(Then replace role/centrality with model-based quantities and add uncertainty panels with ggdist.)
+
+State of the art with R for agent-based models (ABM)
+
+R-native ABM toolkits.
+abmR (movement, landscapes), NetLogoR (NetLogo-style ABM in R), or nlrx (drive NetLogo from R). These accept spatial rasters/vectors and play nicely with sf/terra. 
+mjskay.github.io
++2
+mjskay.github.io
++2
+
+Spatial visualization.
+Use sf + geom_sf() for vector data, tmap for quick thematic maps (static and interactive), and leaflet for exploratory dashboards. For simultaneous encodings (e.g., habitat + agent density), consider multiple scales (ggnewscale) or bivariate palettes; for agent composition, glyphs like PieGlyph. 
+arXiv
++4
+r-spatial.github.io
++4
+CRAN
++4
+
+Dynamics.
+gganimate for time steps; facet time for analysis, animate for narrative. 
+PILI - ESIP
+
+Minimal pattern (ABM trajectories on a map)
+library(sf); library(ggplot2); library(gganimate)
+ggplot() +
+  geom_sf(data = world_sf, linewidth = .2) +
+  geom_path(data = agents_sf, 
+            aes(long, lat, group = id, frame = t), alpha = .3) +
+  coord_sf() +
+  transition_time(t)
+
+State of the art for academia & science (pipelines and polish)
+
+Reproducible manuscripts.
+Quarto for papers/theses/journal templates; integrates code, figs, citations, and cross-refs; supports publisher templates and multi-format outputs. 
+r4ds.hadley.nz
++2
+Quarto
++2
+
+Reproducible pipelines.
+targets for dependency-tracked workflows (model fits → figures → manuscript); visualize DAGs, cache results, and rerun only what changed. 
+PILI - ESIP
+
+Visual regression testing.
+vdiffr to snapshot and diff ggplots in CI; essential when migrating to 4.0.0. 
+vdiffr.r-lib.org
+
+Typography/annotation.
+ggtext for markdown/HTML in plot text; improves figure captions, rich facet labels, and academic styling. 
+wilkelab.org
+
+Ecosystem leverage.
+When the grammar runs out, reach for curated extensions (e.g., ggh4x, ggforce, ggnewscale, patchwork)—start from the official extensions gallery. 
+ggplot2 Extensions
++3
+Teun Brand
++3
+GitHub
++3
+
+Pragmatic upgrade guidance (ggplot2 4.0.0)
+
+Pin & test. Lock your current stack (e.g., renv::snapshot()), then branch and test with 4.0.0. Focus on custom guides/themes and extension packages. 
+R-bloggers
+
+CI safety net. Add vdiffr snapshots for all publication figures; catch subtle guide/spacing changes. 
+vdiffr.r-lib.org
+
+Manuscripts. Render with Quarto and bake sessionInfo()/renv.lock into the repo; include a targets network figure in the appendix for transparency. 
+r4ds.hadley.nz
++1
+
+Where to push further (for your RSiena + ABM context)
+
+Uncertainty-forward storytelling: pair every coefficient/GOF panel with a ggdist interval/density visualization; reserve animations for mechanisms, not evidence. 
+RDocumentation
+
+Network dynamics as small multiples: time-faceted ggraph snapshots with stable layouts (layout seeded per ego-network) outperform single animated hairballs for inference.
+
+Spatial ABM dashboards: prototype in tmap or leaflet before committing to polished ggplot2 figures—optimize readability, then port to static plates for the paper. 
+r-tmap.github.io
++1
+

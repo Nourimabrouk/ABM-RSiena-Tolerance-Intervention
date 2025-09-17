@@ -14,6 +14,38 @@ This repository contains a PhD dissertation project focused on Stochastic Actor-
 **Primary Tools**: R with RSiena, Claude Code for development and analysis coordination
 **Data**: 5825 observations, 2585 respondents, 105 classes, 3 schools, 3 time waves
 
+## 🎯 **CRITICAL PUBLICATION CONSTRAINT**
+
+**MAXIMUM WORD LIMIT: 10,000 WORDS**
+
+This entire research project must produce **ONE HIGH-QUALITY ACADEMIC PAPER** of maximum 10,000 words for publication in a top-tier statistical sociology journal. Every analysis, every code line, every decision must serve this singular publication goal.
+
+### Publication Scope Discipline
+- **Single Focus**: Tolerance intervention effectiveness via network diffusion
+- **Core Contribution**: SAOM methodology for intervention analysis
+- **Key Innovation**: Attraction-repulsion mechanism for tolerance spread
+- **Policy Relevance**: Optimal intervention targeting strategies
+- **Theoretical Advance**: Network-mediated tolerance → cooperation pathway
+
+### Word Allocation Framework
+```
+Target Publication Structure (≤10,000 words):
+├── Abstract (250 words)
+├── Introduction (1,500 words)
+├── Literature Review (1,500 words)
+├── Methodology (2,000 words)
+├── Results (3,000 words)
+├── Discussion (1,500 words)
+└── Conclusion (250 words)
+```
+
+### Scope Boundaries (EXCLUDE)
+- ❌ Multiple intervention types beyond tolerance
+- ❌ Extensive sensitivity analyses beyond journal requirements
+- ❌ Exploratory effects not central to tolerance argument
+- ❌ Methodological extensions for future work
+- ❌ Additional robustness checks beyond essential validation
+
 ## Research Question
 
 How can individual-level changes in tolerance from interventions spread and persist in social networks to increase sustained interethnic cooperation?
@@ -32,7 +64,7 @@ How can individual-level changes in tolerance from interventions spread and pers
 "C:\Program Files\R\R-4.5.1\bin\x64\R.exe"
 
 # Install core packages
-"C:\Program Files\R\R-4.5.1\bin\x64\Rscript.exe" -e "install.packages(c('RSiena', 'RSienaTest', 'network', 'sna', 'igraph', 'tidyverse', 'data.table', 'ggplot2', 'ggraph', 'parallel', 'foreach', 'doParallel'), repos='https://cloud.r-project.org')"
+"C:\Program Files\R\R-4.5.1\bin\x64\Rscript.exe" -e "install.packages(c('RSiena', 'RSienaTest', 'network', 'sna', 'igraph', 'tidyverse', 'data.table', 'ggplot2', 'ggraph', 'ggdist', 'ggtext', 'gganimate', 'sf', 'tmap', 'vdiffr', 'ggh4x', 'ggforce', 'ggnewscale', 'patchwork', 'targets', 'quarto', 'parallel', 'foreach', 'doParallel'), repos='https://cloud.r-project.org')"
 ```
 
 ### VSCode Terminal Workflow
@@ -95,6 +127,87 @@ How can individual-level changes in tolerance from interventions spread and pers
 - Implement via custom interaction effects
 - Document threshold parameters clearly
 
+## Modern Visualization Standards (ggplot2 4.0.0)
+
+### Grammar of Graphics Philosophy
+
+Following Wickham's north star principle: treat plots as declarative compositions of **data → aesthetics → geometric marks**, modulated by scales, stats, coordinates, facets, and themes. ggplot2 4.0.0 modernizes internals with S7 object system while maintaining the declarative API.
+
+### Key ggplot2 4.0.0 Updates
+
+**Breaking Changes**:
+- S3 parts replaced with S7 object system for better type safety
+- Enhanced guide system for axes and legends
+- Deprecated dot-dot notation (use `after_stat()` instead)
+- `size` aesthetic replaced with `linewidth` for lines
+
+**New Features for Research**:
+- `coord_radial()` for circular network layouts
+- `stat_connect()` for connecting network nodes
+- Enhanced theme integration and customization
+- Better pattern fills and gradient support
+
+### Visualization Workflow for Statistical Sociology
+
+**Core Principles**:
+1. **Declarative, data-first grammar**: Map variables to aesthetics, specify geoms
+2. **Small multiples over visual complexity**: Use facets instead of overlapping elements
+3. **Uncertainty as first-class citizen**: Always show confidence intervals
+4. **Reproducible pipelines**: Integrate with targets and Quarto
+
+**State-of-the-Art Stack**:
+- **ggplot2 4.0.0**: Core grammar of graphics
+- **ggdist + tidybayes**: Uncertainty visualization
+- **ggraph + tidygraph**: Network visualization
+- **sf + tmap**: Spatial ABM visualization
+- **gganimate**: Dynamic network evolution
+- **Quarto + targets**: Reproducible publication pipeline
+- **vdiffr**: Visual regression testing
+
+### Network Visualization Standards
+
+**Minimal Network Pattern**:
+```r
+library(ggraph)
+library(tidygraph)
+library(ggdist)
+
+# Network snapshots across time
+graph %>%
+  activate(nodes) %>%
+  mutate(role = factor(role)) %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(alpha = .15, linewidth = 0.5) +
+  geom_node_point(aes(color = role, size = centrality)) +
+  facet_wrap(~ time) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+**RSiena Model Diagnostics**:
+```r
+# Convergence diagnostics with uncertainty
+convergence_data %>%
+  ggplot(aes(x = effect, y = t_ratio)) +
+  geom_hline(yintercept = c(-0.1, 0.1), linetype = "dashed") +
+  stat_halfeye() +
+  coord_flip() +
+  labs(title = "SAOM Convergence Diagnostics",
+       subtitle = "t-ratios should be within ±0.1")
+```
+
+**Intervention Effect Visualization**:
+```r
+# Show tolerance diffusion with uncertainty
+intervention_effects %>%
+  ggplot(aes(x = time, y = tolerance)) +
+  stat_lineribbon(aes(group = scenario, color = scenario),
+                  .width = c(.50, .80, .95)) +
+  scale_fill_brewer(type = "seq") +
+  facet_wrap(~ intervention_type) +
+  theme_minimal()
+```
+
 ## Repository Structure
 
 ```
@@ -104,30 +217,75 @@ ABM R/
 │   │   ├── 00_data_prep.R     # Data preparation scripts
 │   │   ├── 01_baseline.R      # Baseline model specifications
 │   │   ├── 02_estimation.R    # Model estimation with convergence
-│   │   └── 03_simulation.R    # Forward simulation scenarios
+│   │   ├── 03_simulation.R    # Forward simulation scenarios
+│   │   └── 04_intervention.R  # Tolerance intervention modeling
 │   ├── custom_effects/         # C++ custom effect implementations
+│   │   ├── attraction_repulsion.cpp  # Friend-based influence effects
+│   │   └── complex_contagion.cpp     # Multiple exposure effects
 │   ├── data_analysis/          # Descriptive and exploratory analysis
+│   │   ├── network_descriptives.R   # Network structure analysis
+│   │   └── tolerance_descriptives.R # Tolerance distribution analysis
 │   ├── intervention/           # Intervention scenario testing
+│   │   ├── targeting_strategies.R   # Who to target analysis
+│   │   ├── dosage_effects.R         # Intervention intensity effects
+│   │   └── diffusion_patterns.R     # Tolerance spread analysis
 │   ├── diagnostics/            # Convergence and GOF assessments
-│   ├── visualization/          # Network and results plotting
+│   │   ├── convergence_checks.R     # Model convergence monitoring
+│   │   └── goodness_of_fit.R        # sienaGOF implementations
+│   ├── visualization/          # Modern ggplot2 4.0.0 plotting
+│   │   ├── network_plots.R          # ggraph network visualizations
+│   │   ├── tolerance_plots.R        # ggdist uncertainty plots
+│   │   ├── intervention_plots.R     # gganimate diffusion animations
+│   │   └── publication_themes.R     # Custom ggplot2 themes
 │   └── utils/                  # Helper functions and utilities
+│       ├── rsiena_helpers.R         # RSiena workflow functions
+│       └── plotting_helpers.R       # ggplot2 utility functions
 ├── data/
-│   ├── raw/                    # Original survey data
+│   ├── raw/                    # Original survey data (Together for Tolerance)
+│   │   ├── wave1/              # First wave data
+│   │   ├── wave2/              # Second wave data
+│   │   └── wave3/              # Third wave data
 │   ├── processed/              # RSiena-ready objects
+│   │   ├── friendship_networks.rds   # sienaDependent network objects
+│   │   ├── tolerance_behavior.rds    # sienaDependent behavior objects
+│   │   └── covariates.rds           # Actor and dyadic covariates
 │   ├── networks/               # Network matrices by wave
 │   └── simulated/              # Simulation outputs
+│       ├── baseline_sims/           # Baseline model simulations
+│       └── intervention_sims/       # Intervention scenario simulations
 ├── scripts/                    # Orchestration and pipeline scripts
+│   ├── _targets.R              # targets workflow definition
+│   ├── run_full_analysis.R     # Complete analysis pipeline
+│   └── batch_simulations.R     # Parallel simulation execution
 ├── tests/                      # Unit and integration tests
+│   ├── testthat/               # testthat framework tests
+│   └── test_convergence.R      # Model convergence tests
 ├── docs/                       # Documentation and reports
+│   ├── dissertation/           # Dissertation chapters
+│   ├── presentations/          # Conference presentations
+│   └── methodology/            # Methodological documentation
 ├── configs/                    # Model configurations
+│   ├── baseline_models.yaml    # Baseline model specifications
+│   └── intervention_scenarios.yaml  # Intervention design configs
 ├── outputs/
-│   ├── figures/                # Publication-ready plots
-│   ├── reports/                # Analysis reports
+│   ├── figures/                # Publication-ready plots (ggplot2 4.0.0)
+│   │   ├── networks/           # Network visualization outputs
+│   │   ├── diagnostics/        # Model diagnostic plots
+│   │   └── interventions/      # Intervention effect plots
+│   ├── reports/                # Analysis reports (Quarto)
+│   ├── models/                 # Fitted RSiena model objects
 │   └── simulations/            # Simulation results
+├── _targets/                   # targets pipeline cache
+├── renv/                       # renv package management
+├── renv.lock                   # Reproducible package versions
 ├── .claude/                    # Claude Code configuration
 │   ├── settings.json           # Project-specific settings
 │   └── agents/                 # Specialized agent configurations
 ├── internal/                   # Research materials and planning
+│   ├── literature/             # Research papers and references
+│   ├── presentations/          # Draft presentations
+│   └── methodology/            # Methodological notes
+├── REQUIREMENTS.md             # Complete dependency specifications
 └── CLAUDE.md                   # This file
 ```
 
@@ -135,16 +293,22 @@ ABM R/
 
 ### Main Analysis Template (R/siena_models/main_analysis.R)
 ```r
-# Load libraries
+# Modern Analysis Template with ggplot2 4.0.0
 library(RSiena)
 library(tidyverse)
+library(ggplot2)      # 4.0.0 with S7 object system
+library(ggdist)       # Uncertainty visualization
+library(ggraph)       # Network visualization
+library(tidygraph)    # Network data manipulation
+library(targets)      # Reproducible pipeline
 library(parallel)
 
 # Set seed for reproducibility
 set.seed(20250917)
 
 # Source utilities
-source("R/utils/helpers.R")
+source("R/utils/rsiena_helpers.R")
+source("R/utils/plotting_helpers.R")
 
 # Load and prepare data
 source("R/siena_models/00_data_prep.R")
@@ -155,13 +319,26 @@ source("R/siena_models/01_baseline.R")
 # Estimate with convergence
 source("R/siena_models/02_estimation.R")
 
-# Generate outputs
-pdf("outputs/figures/convergence.pdf")
-# ... plotting code
-dev.off()
+# Modern visualization outputs
+source("R/visualization/network_plots.R")
+source("R/visualization/tolerance_plots.R")
 
-# Save results
-saveRDS(fit, "outputs/models/main_fit.rds")
+# Generate publication-ready plots
+ggsave("outputs/figures/network_evolution.pdf",
+       plot_network_evolution(fit),
+       width = 12, height = 8, dpi = 300)
+
+ggsave("outputs/figures/convergence_diagnostics.pdf",
+       plot_convergence_diagnostics(fit),
+       width = 10, height = 6, dpi = 300)
+
+# Save results with metadata
+saveRDS(list(
+  model = fit,
+  session_info = sessionInfo(),
+  timestamp = Sys.time(),
+  convergence = summary(fit)$tconv.max
+), "outputs/models/main_fit.rds")
 ```
 
 ## Parallel Processing
@@ -179,19 +356,39 @@ stopCluster(cl)
 ## Output Management
 
 **All outputs must be saved to files**:
-- Plots: PDF or PNG in outputs/figures/
-- Models: RDS files in outputs/models/
-- Tables: CSV files in outputs/tables/
-- Reports: R Markdown rendered to HTML/PDF in outputs/reports/
+- Plots: High-resolution PDF with ggplot2 4.0.0 in outputs/figures/
+- Models: RDS files with metadata in outputs/models/
+- Tables: CSV files with proper encoding in outputs/tables/
+- Reports: Quarto documents rendered to HTML/PDF in outputs/reports/
+- Visual tests: vdiffr snapshots for plot regression testing
+
+**Modern Output Standards**:
+```r
+# High-quality plot export
+ggsave("outputs/figures/plot.pdf", plot_object,
+       width = 10, height = 8, dpi = 300, device = cairo_pdf)
+
+# Model export with metadata
+saveRDS(list(
+  model = fitted_model,
+  convergence = convergence_summary,
+  session_info = sessionInfo(),
+  timestamp = Sys.time()
+), "outputs/models/model.rds")
+
+# Visual regression testing
+vdiffr::expect_doppelganger("network_plot", network_plot)
+```
 
 ## Claude Code Agent Coordination
 
-**Agent Specialization**:
-- **data_prep_agent**: Handles data cleaning and RSiena object creation
-- **model_dev_agent**: Develops and tests model specifications
-- **convergence_agent**: Monitors and ensures model convergence
-- **simulation_agent**: Runs intervention scenarios
-- **viz_agent**: Creates publication-ready visualizations
+**Meta-Optimal Agent Architecture** (10k Word Publication Focus):
+- **meta_research_coordinator**: Orchestrates entire PhD project within publication scope
+- **rsiena_implementation_specialist**: Bulletproof RSiena implementation and convergence
+- **publication_writer**: Crafts exceptional 10k word statistical sociology paper
+- **statistical_sociology_analyst**: Bridges methodology with sociological theory
+- **abm_simulation_optimizer**: Maximizes computational efficiency and insight
+- **academic_software_engineer**: Ensures publication-grade reproducibility
 
 **Agent Communication**:
 Agents coordinate through:
