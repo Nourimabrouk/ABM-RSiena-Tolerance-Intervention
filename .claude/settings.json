@@ -1,0 +1,75 @@
+{
+  "project_name": "ABM_RSiena_Research",
+  "description": "PhD research on tolerance interventions for interethnic cooperation using Stochastic Actor-Oriented Models",
+  "primary_language": "R",
+  "r_executable": "C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\Rscript.exe",
+  "r_interactive": "C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\R.exe",
+  "working_directory": "C:\\Users\\Nouri\\Documents\\GitHub\\ABM R",
+
+  "core_packages": [
+    "RSiena",
+    "RSienaTest",
+    "network",
+    "sna",
+    "igraph",
+    "tidyverse",
+    "data.table",
+    "ggplot2",
+    "ggraph",
+    "parallel",
+    "foreach",
+    "doParallel"
+  ],
+
+  "convergence_standards": {
+    "max_t_ratio": 0.1,
+    "max_convergence_ratio": 0.25,
+    "min_jaccard_stability": 0.30
+  },
+
+  "output_directories": {
+    "figures": "outputs/figures",
+    "models": "outputs/models",
+    "reports": "outputs/reports",
+    "simulations": "outputs/simulations",
+    "tables": "outputs/tables"
+  },
+
+  "agents": {
+    "data_prep": {
+      "description": "Handles data cleaning and RSiena object preparation",
+      "scripts": ["R/siena_models/00_data_prep.R"]
+    },
+    "model_dev": {
+      "description": "Develops and tests SAOM specifications",
+      "scripts": ["R/siena_models/01_baseline.R", "R/siena_models/02_estimation.R"]
+    },
+    "convergence": {
+      "description": "Monitors and ensures model convergence",
+      "scripts": ["R/diagnostics/convergence_check.R"]
+    },
+    "simulation": {
+      "description": "Runs intervention scenarios and counterfactuals",
+      "scripts": ["R/siena_models/03_simulation.R", "R/intervention/scenarios.R"]
+    },
+    "visualization": {
+      "description": "Creates publication-ready plots and figures",
+      "scripts": ["R/visualization/network_plots.R", "R/visualization/results_plots.R"]
+    }
+  },
+
+  "research_focus": {
+    "method": "Stochastic Actor-Oriented Models (SAOM)",
+    "software": "RSiena",
+    "research_question": "How can tolerance interventions spread through networks to increase interethnic cooperation?",
+    "key_concepts": ["tolerance", "social influence", "network selection", "complex contagion", "attraction-repulsion"]
+  },
+
+  "coding_standards": {
+    "save_all_outputs": true,
+    "use_absolute_paths": true,
+    "document_seeds": true,
+    "test_coverage": true,
+    "version_control": "git"
+  }
+}

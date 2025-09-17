@@ -1,0 +1,85 @@
+{
+  "R": {
+    "Version": "4.5.1",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cloud.r-project.org"
+      }
+    ]
+  },
+  "Packages": {
+    "RSiena": {
+      "Package": "RSiena",
+      "Version": "1.4.8",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "RSienaTest": {
+      "Package": "RSienaTest",
+      "Version": "1.4.8",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "network": {
+      "Package": "network",
+      "Version": "1.18.2",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "sna": {
+      "Package": "sna",
+      "Version": "2.7.2",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "igraph": {
+      "Package": "igraph",
+      "Version": "2.0.3",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "tidyverse": {
+      "Package": "tidyverse",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "data.table": {
+      "Package": "data.table",
+      "Version": "1.15.4",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "ggplot2": {
+      "Package": "ggplot2",
+      "Version": "3.5.1",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "ggraph": {
+      "Package": "ggraph",
+      "Version": "2.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "parallel": {
+      "Package": "parallel",
+      "Version": "4.5.1",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "foreach": {
+      "Package": "foreach",
+      "Version": "1.5.2",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "doParallel": {
+      "Package": "doParallel",
+      "Version": "1.0.17",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    }
+  }
+}
