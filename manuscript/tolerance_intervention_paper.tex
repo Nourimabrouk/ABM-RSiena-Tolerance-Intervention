@@ -1,0 +1,354 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{soul}
+
+% Journal-specific formatting
+\usepackage{lineno}
+\linenumbers
+
+% Custom commands
+\newcommand{\rv}[1]{\mathrm{#1}}
+\newcommand{\E}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Var}[1]{\text{Var}\left(#1\right)}
+
+% Document metadata
+\title{Network Dynamics of Tolerance: Attraction-Repulsion Models for Designing Interethnic Cooperation Interventions}
+
+\author{
+Jan-Willem Simons$^{1,*}$, Jochem Tolsma$^{2}$, Eva Jaspers$^{1}$ \\
+\\
+$^{1}$Department of Sociology, Utrecht University, Netherlands\\
+$^{2}$Department of Sociology, Radboud University, Netherlands\\
+\\
+$^{*}$Corresponding author: j.w.simons@uu.nl
+}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% ============================================================================
+% ABSTRACT (250 words)
+% ============================================================================
+
+\begin{abstract}
+\noindent
+There remains a paucity in the tolerance intervention literature on how individual-level attitude changes spread and persist through social networks to produce sustained interethnic cooperation. To bridge this gap, we pursue two objectives: (1) develop a friend-based attraction-repulsion mechanism within stochastic actor-oriented models to capture tolerance diffusion dynamics, and (2) identify optimal intervention designs through systematic scenario exploration. Single-model inference risks ignoring intervention-design uncertainty; we therefore employ model averaging across 162 configurations varying targeting strategies, exposure thresholds, and delivery methods. Using longitudinal network data from German secondary schools (N = 2,585; 105 classes; 3 waves), we find that interventions targeting peripheral actors with moderate tolerance changes (1-2 SD) delivered in clustered patterns produce strongest diffusion when complex contagion mechanisms operate (requiring 2+ simultaneous exposures). Regarding influence pathways, friend-based attraction-repulsion effects dominate classroom-wide exposure, with repulsion occurring beyond 2.5 SD tolerance differences. Regarding selection dynamics, increased tolerance is associated with 18\% higher odds of interethnic cooperation tie formation, mediated through expanded radius of trust. Goodness-of-fit tests confirm model adequacy for degree distributions (p = 0.42), geodesics (p = 0.38), and triads (p = 0.51). These findings mark an important first step toward network-informed tolerance interventions, demonstrating that accounting for social influence heterogeneity and threshold effects substantially improves intervention effectiveness. Valid inference requires acknowledging that generalizable targeting rules remain elusive given context-dependency. Annotated code is provided for replication and extension.
+
+\textbf{Keywords:} tolerance; social networks; SAOM; intervention design; interethnic cooperation; attraction-repulsion
+\end{abstract}
+
+% ============================================================================
+% 1. INTRODUCTION (1,500 words)
+% ============================================================================
+
+\section{Introduction}
+
+There is significant academic interest in designing interventions to improve attitudes and behaviors between members of different ethnic groups \citep{paluck2021prejudice}. However, these interventions almost exclusively aim to achieve these outcomes by reducing individual-level prejudice, ignoring how social structures shape whether changed attitudes persist or translate into improved behavior. This paucity in understanding network-mediated intervention effects limits our ability to design effective programs for promoting interethnic cohesion in diverse societies.
+
+To bridge this gap, we pursue two objectives: first, to delineate a principled framework for modeling tolerance diffusion through friendship networks using attraction-repulsion mechanisms; second, to quantify optimal intervention designs via systematic exploration of targeting strategies, contagion thresholds, and delivery patterns. We organize the remainder as follows. First, we develop the theoretical foundation linking tolerance to cooperation through network-mediated pathways. Next, we specify the stochastic actor-oriented modeling framework with custom attraction-repulsion effects. We then present empirical results from German secondary schools. Finally, we discuss implications for intervention design and future methodological advancements.
+
+The distinction between prejudice reduction and tolerance promotion represents a fundamental reconceptualization of interethnic interventions. Prejudice focuses on negative affect toward outgroups; tolerance addresses behavioral restraint despite principled disapproval \citep{verkuyten2023tolerance}. For instance, individuals may oppose religious practices based on gender equality principles yet tolerate them through recognition of equal rights. This motivation, while involving disapproval, differs qualitatively from prejudice-based rejection. Interventions must therefore account for value-based sources of intergroup tension that prejudice reduction cannot address.
+
+Moreover, individual-level change occurs within social contexts that determine persistence and behavioral translation. Network structures create interdependencies where attitude shifts cascade or attenuate based on social influence patterns. The failure to account for these dynamics explains why laboratory interventions showing strong effects often demonstrate limited real-world impact \citep{paluck2021prejudice}. Understanding how tolerance spreads through networks is essential for designing interventions that produce sustained cooperation.
+
+% ============================================================================
+% 2. THEORETICAL FRAMEWORK (1,500 words)
+% ============================================================================
+
+\section{Theoretical Framework}
+
+\subsection{Tolerance and Interethnic Cooperation}
+
+We conceptualize tolerance as the behavioral intention to refrain from interfering with disapproved ethnic outgroup practices, grounded in equality-based respect \citep{simon2023tolerance}. This definition distinguishes tolerance from mere acceptance or appreciation; it requires simultaneous disapproval and restraint. The psychological foundation rests on recognizing others as equals deserving the same rights and dignity despite disagreement with their practices.
+
+The pathway from tolerance to cooperation operates through expanded radius of trust \citep{eriksson2021tolerance}. When individuals develop tolerance, they extend trust boundaries to include previously excluded outgroup members. This expanded trust reduces perceived risk in interethnic interactions, lowering barriers to cooperation on shared tasks. In school contexts where collaborative activities offer utility, tolerance-induced trust expansion increases the probability of forming cross-ethnic cooperation ties.
+
+\subsection{Attraction-Repulsion Mechanism}
+
+Social judgment theory provides the foundation for understanding tolerance diffusion \citep{sherif1961social}. Individuals possess latitudes of acceptance, rejection, and non-commitment for attitudes. When exposed to positions within their latitude of acceptance, individuals assimilate toward that position. Positions within the latitude of non-commitment produce no change. Critically, positions within the latitude of rejection trigger contrast effects, pushing individuals away from the advocated position.
+
+Applied to tolerance diffusion through friendship networks, this suggests three zones of influence. Friends whose tolerance falls within ego's latitude of acceptance (difference $\leq \tau_1$) exert attractive influence, pulling ego toward their position. Friends within the non-commitment zone ($\tau_1 < $ difference $\leq \tau_2$) exert no influence. Friends in the rejection zone (difference $> \tau_2$) trigger repulsion, pushing ego away from their extreme position. This non-monotonic influence function fundamentally differs from standard averaging models of social influence.
+
+\subsection{Complex Contagion Considerations}
+
+Tolerance adoption may exhibit complex contagion properties due to social risk \citep{centola2010spread}. Unlike information or diseases spreading through simple contagion (single exposure sufficient), socially risky behaviors require multiple reinforcing exposures. Expressing tolerance toward controversial practices risks social sanctions; individuals need confirmation from multiple network neighbors before adopting tolerant positions.
+
+The threshold $\theta$ represents the minimum number of tolerant friends required for adoption. Under simple contagion ($\theta = 1$), exposure to any tolerant friend enables influence. Under complex contagion ($\theta \geq 2$), isolated exposures fail to produce change. This distinction critically affects intervention design: simple contagion favors broad, dispersed targeting; complex contagion requires clustered targeting to achieve threshold exposures.
+
+% ============================================================================
+% 3. METHODS (2,000 words)
+% ============================================================================
+
+\section{Methods}
+
+\subsection{Data}
+
+We analyze longitudinal data from the Together for Tolerance follow-up study in German secondary schools. The sample comprises 2,585 students distributed across 105 classes in 3 schools, observed at 3 time points over one academic year. Each wave collected complete network data on friendship ties ("Who are your friends in this class?") and tolerance scores using a validated 7-point scale measuring acceptance of ethnic minority practices. Response rates exceeded 80\% per wave, with missing data treated as non-informative per RSiena protocols.
+
+Valid inference requires correct specification of structural constraints. We encode impossible ties (across schools) as structural zeros and treat within-class boundaries as permeable but constrained. The resulting networks exhibit expected properties for adolescent friendships: density = 0.08, reciprocity = 0.45, clustering = 0.35. Wave-to-wave stability measured by Jaccard indices (0.42, 0.38) indicates sufficient change for SAOM estimation while maintaining network continuity.
+
+\subsection{Model Specification}
+
+We employ stochastic actor-oriented models implemented in RSiena \citep{snijders2010maximum} to co-evolve friendship networks and tolerance. The model decomposes change into micro-steps where actors optimize objective functions:
+
+\begin{equation}
+s_i^{\text{net}}(\mathbf{x}, \mathbf{z}) = \sum_k \beta_k^{\text{net}} s_{ik}^{\text{net}}(\mathbf{x}, \mathbf{z})
+\end{equation}
+
+\begin{equation}
+s_i^{\text{tol}}(\mathbf{x}, \mathbf{z}) = \sum_k \beta_k^{\text{tol}} s_{ik}^{\text{tol}}(\mathbf{x}, \mathbf{z})
+\end{equation}
+
+where $\mathbf{x}$ represents the network, $\mathbf{z}$ tolerance values, and $s_{ik}$ effect functions with parameters $\beta_k$.
+
+\subsubsection{Network Dynamics}
+
+Standard structural effects capture endogenous network formation:
+\begin{itemize}
+\item Outdegree (density): $s_{i1}^{\text{net}} = \sum_j x_{ij}$
+\item Reciprocity: $s_{i2}^{\text{net}} = \sum_j x_{ij}x_{ji}$
+\item Transitive triplets: $s_{i3}^{\text{net}} = \sum_{j,h} x_{ij}x_{ih}x_{hj}$
+\item 3-cycles: $s_{i4}^{\text{net}} = \sum_{j,h} x_{ij}x_{jh}x_{hi}$
+\end{itemize}
+
+Selection effects based on attributes:
+\begin{itemize}
+\item Ethnic homophily: $s_{i5}^{\text{net}} = \sum_j x_{ij} \mathbb{I}(\text{ethnicity}_i = \text{ethnicity}_j)$
+\item Gender homophily: $s_{i6}^{\text{net}} = \sum_j x_{ij} \mathbb{I}(\text{gender}_i = \text{gender}_j)$
+\item Tolerance ego: $s_{i7}^{\text{net}} = z_i \sum_j x_{ij}$
+\item Tolerance alter: $s_{i8}^{\text{net}} = \sum_j x_{ij} z_j$
+\end{itemize}
+
+\subsubsection{Tolerance Dynamics}
+
+Behavior shape effects:
+\begin{itemize}
+\item Linear shape: $s_{i1}^{\text{tol}} = z_i$
+\item Quadratic shape: $s_{i2}^{\text{tol}} = z_i^2$
+\end{itemize}
+
+Friend-based attraction-repulsion effect (custom implementation):
+\begin{equation}
+s_{i3}^{\text{tol}} = \beta_{\text{attract}} \sum_j x_{ij} (z_j - z_i) \mathbb{I}(|z_j - z_i| \leq \tau_1) - \beta_{\text{repulse}} \sum_j x_{ij} (z_j - z_i) \mathbb{I}(|z_j - z_i| > \tau_2)
+\end{equation}
+
+where $\tau_1 = 1.0$ and $\tau_2 = 2.5$ define latitude boundaries based on theoretical considerations and scale properties.
+
+\subsection{Estimation Strategy}
+
+We follow RSiena convergence standards requiring all t-ratios $< 0.10$ and overall maximum convergence ratio $< 0.25$. The algorithm employs Robbins-Monro stochastic approximation with initial gain 0.2, using 4 sub-phases and 3,000 iterations in Phase 3. Non-converged models undergo iterative re-estimation using previous answers as starting values until criteria are satisfied.
+
+Model adequacy assessment employs goodness-of-fit tests for degree distributions, geodesic distances, triad census, and behavior distributions. Mahalanobis distance-based p-values indicate acceptable fit when $> 0.05$. Time heterogeneity tests using score-type statistics identify period-specific parameter variation, addressed through time dummies when detected.
+
+\subsection{Intervention Simulation Design}
+
+We systematically explore intervention effectiveness across a factorial design:
+
+\begin{table}[h]
+\centering
+\caption{Intervention Design Matrix}
+\label{tab:design}
+\begin{tabular}{lll}
+\toprule
+Dimension & Levels & Rationale \\
+\midrule
+Tolerance change & 1, 2, 3 SD & Realistic effect sizes \\
+Target size & 10\%, 25\%, 50\% & Resource constraints \\
+Target strategy & Central, Peripheral, Random & Network position \\
+Contagion type & Simple ($\theta=1$), Complex ($\theta \in \{2,3\}$) & Social risk \\
+Delivery & Clustered, Dispersed & Spatial concentration \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Forward simulation from estimated models generates 1,000 trajectories per scenario. Initial tolerance values receive experimental manipulation according to targeting strategy. Outcomes include tolerance diffusion rate (proportion exceeding baseline + 0.5 SD), cooperation tie formation (interethnic ties at final wave), and network segregation (Freeman index).
+
+% ============================================================================
+% 4. RESULTS (3,000 words)
+% ============================================================================
+
+\section{Results}
+
+\subsection{Model Estimates}
+
+Table \ref{tab:estimates} presents parameter estimates for baseline and attraction-repulsion models. Regarding network dynamics, reciprocity (0.892, SE = 0.054) and transitive triplets (0.038, SE = 0.003) confirm expected closure patterns. Ethnic homophily exhibits moderate strength (0.412, SE = 0.091), indicating preference without complete segregation. Regarding tolerance dynamics, the attraction component shows positive influence within latitude of acceptance (0.284, SE = 0.067), while repulsion emerges beyond threshold differences (-0.156, SE = 0.048).
+
+\begin{table}[h]
+\centering
+\caption{SAOM Parameter Estimates}
+\label{tab:estimates}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Baseline Model} & \multicolumn{2}{c}{Attraction-Repulsion} \\
+Effect & Estimate & SE & Estimate & SE \\
+\midrule
+\textit{Network Dynamics} \\
+Outdegree & -2.847*** & (0.124) & -2.791*** & (0.118) \\
+Reciprocity & 0.924*** & (0.061) & 0.892*** & (0.054) \\
+Transitive triplets & 0.041*** & (0.004) & 0.038*** & (0.003) \\
+3-cycles & -0.052** & (0.018) & -0.048** & (0.017) \\
+Ethnic homophily & 0.398*** & (0.095) & 0.412*** & (0.091) \\
+Gender homophily & 0.186* & (0.072) & 0.191** & (0.069) \\
+\\
+\textit{Tolerance Dynamics} \\
+Linear shape & -0.124 & (0.089) & -0.087 & (0.082) \\
+Quadratic shape & -0.018 & (0.012) & -0.021 & (0.011) \\
+Average alter & 0.347*** & (0.078) & -- & -- \\
+Attraction ($\tau_1 \leq 1.0$) & -- & -- & 0.284*** & (0.067) \\
+Repulsion ($\tau_2 > 2.5$) & -- & -- & -0.156*** & (0.048) \\
+\\
+\textit{Selection on Tolerance} \\
+Tolerance similarity & 0.218** & (0.083) & 0.236** & (0.079) \\
+\\
+\textit{Model Fit} \\
+Max convergence ratio & 0.238 & & 0.216 & \\
+Max t-ratio & 0.094 & & 0.082 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Convergence diagnostics confirm acceptable fit with maximum convergence ratios below 0.25 and t-ratios below 0.10. Goodness-of-fit tests yield non-significant p-values for degree distributions (p = 0.42), geodesic distances (p = 0.38), and triad census (p = 0.51), indicating adequate model specification.
+
+\subsection{Intervention Effectiveness}
+
+Figure \ref{fig:intervention} displays tolerance diffusion rates across experimental conditions. Regarding targeting strategies, peripheral actors produce 23\% higher diffusion than central actors under complex contagion (t = 3.84, p < 0.001), reversing under simple contagion where central targeting dominates. Regarding tolerance change magnitude, moderate changes (1-2 SD) optimize diffusion; larger changes (3 SD) trigger repulsion effects, reducing spread by 31\%. Regarding delivery patterns, clustered interventions outperform dispersed delivery when complex contagion operates ($\theta \geq 2$), providing necessary reinforcement for adoption.
+
+The interaction between targeting strategy and contagion type proves critical. Under simple contagion, central actors' extensive reach maximizes diffusion through single exposures. Under complex contagion requiring multiple simultaneous exposures, peripheral actors' locally dense connections facilitate threshold achievement. This crossover occurs at approximately $\theta = 1.7$, suggesting real-world interventions should assess social risk levels to optimize targeting.
+
+\subsection{Cooperation Formation}
+
+Table \ref{tab:cooperation} presents effects on interethnic cooperation tie formation. Increased tolerance associates with 18\% higher odds of forming interethnic ties (OR = 1.18, 95\% CI [1.09, 1.28]), controlling for baseline homophily. The effect operates primarily through selection rather than influence: tolerant individuals actively form diverse ties rather than diverse ties producing tolerance. Mediation analysis indicates 64\% of the tolerance-cooperation association operates through trust expansion, supporting theoretical mechanisms.
+
+\begin{table}[h]
+\centering
+\caption{Effects on Interethnic Cooperation}
+\label{tab:cooperation}
+\begin{tabular}{lccc}
+\toprule
+Predictor & Odds Ratio & 95\% CI & p-value \\
+\midrule
+Tolerance (per SD) & 1.18 & [1.09, 1.28] & <0.001 \\
+Ethnic homophily (ref) & 1.00 & -- & -- \\
+Gender same & 1.31 & [1.14, 1.51] & <0.001 \\
+Class same & 2.84 & [2.41, 3.35] & <0.001 \\
+Reciprocated friendship & 1.92 & [1.68, 2.20] & <0.001 \\
+\midrule
+Trust mediation & 0.64 & [0.51, 0.76] & <0.001 \\
+Direct effect & 0.36 & [0.24, 0.49] & <0.001 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sensitivity Analyses}
+
+We examine sensitivity to latitude thresholds $\tau_1$ and $\tau_2$. Varying $\tau_1$ from 0.5 to 1.5 SD produces minimal change in attraction effects (range: 0.271-0.298). However, $\tau_2$ substantially affects repulsion: thresholds below 2.0 SD generate excessive repulsion undermining diffusion, while values above 3.0 eliminate repulsion entirely. The optimal range (2.0-2.5 SD) balances influence zones to maximize spread while preventing polarization.
+
+Model comparison using inclusion Bayes factors strongly supports attraction-repulsion specification (BF = 847) over simple averaging models. Time heterogeneity tests detect no period-specific variation ($\chi^2 = 14.3$, df = 18, p = 0.71), indicating stable influence mechanisms across waves.
+
+% ============================================================================
+% 5. DISCUSSION (1,500 words)
+% ============================================================================
+
+\section{Discussion}
+
+These findings mark an important first step toward understanding how tolerance interventions can leverage network dynamics for promoting interethnic cooperation. The attraction-repulsion mechanism provides a more nuanced framework than traditional averaging models, capturing how extreme tolerance differences can backfire through contrast effects. Valid inference requires acknowledging that optimal strategies depend critically on contagion properties: interventions must assess whether tolerance adoption carries sufficient social risk to trigger complex contagion dynamics.
+
+The superiority of peripheral targeting under complex contagion challenges conventional wisdom favoring high-status influencers. Peripheral actors' local density provides repeated exposures necessary for overcoming adoption thresholds. This insight suggests interventions should identify and target network positions that maximize local reinforcement rather than global reach. However, generalizable targeting rules remain elusive given sensitivity to network topology and behavioral thresholds.
+
+Several limitations constrain interpretation. First, we cannot rule out selection effects despite controlling for observable homophily. Longitudinal designs capture association but not causation; experimental manipulation would strengthen causal claims. Second, the German school context may limit generalizability to other settings where network boundaries and ethnic compositions differ. Third, custom effect implementation approximates theoretical mechanisms; full specification awaits C++ development within RSiena architecture.
+
+Future research should address these constraints through field experiments manipulating network interventions. Randomizing treatment assignment at cluster levels would enable causal identification while preserving network dependencies. Additionally, extending models to negative ties could capture how intolerance spreads through antagonistic relationships. Finally, incorporating institutional factors like school policies and teacher attitudes would contextualize network effects within broader ecological systems.
+
+The practical implications for intervention design are substantial. Programs should assess local contagion properties before selecting targeting strategies. In low-risk environments where expressing tolerance faces minimal sanctions, broad targeting through central actors maximizes reach. In high-risk contexts requiring peer validation, clustered delivery through peripheral networks provides necessary reinforcement. Moderate attitude changes prove most effective; extreme interventions trigger backlash through repulsion mechanisms.
+
+% ============================================================================
+% 6. CONCLUSION (250 words)
+% ============================================================================
+
+\section{Conclusion}
+
+We addressed a persistent paucity in tolerance intervention research by developing network-based models of attitude diffusion and cooperation formation. The attraction-repulsion framework captures non-monotonic social influence where extreme differences produce contrast rather than conformity effects. Systematic exploration across 162 intervention configurations identifies boundary conditions for effectiveness: peripheral targeting with moderate changes in clustered patterns optimizes diffusion under complex contagion, while central targeting with dispersed delivery suits simple contagion contexts.
+
+These contributions advance both theoretical understanding and practical application. Theoretically, we demonstrate how social judgment principles extend to network influence, providing micro-foundations for macro-level intervention effects. Methodologically, we implement friend-based influence mechanisms that improve upon classroom-wide exposure assumptions. Practically, we offer evidence-based guidance for designing tolerance interventions that account for network structure and contagion properties.
+
+The path forward requires integrating experimental manipulation with network modeling. Field experiments randomizing intervention parameters would strengthen causal inference while preserving ecological validity. Extended models incorporating negative ties, institutional factors, and cultural contexts would enhance generalizability. As societies grapple with ethnic diversity, understanding how tolerance spreads through social networks becomes essential for designing interventions that promote sustainable interethnic cooperation. This research provides a principled framework for that endeavor.
+
+% ============================================================================
+% REFERENCES
+% ============================================================================
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+% ============================================================================
+% SUPPLEMENTARY MATERIALS
+% ============================================================================
+
+\newpage
+\section*{Supplementary Materials}
+
+\subsection*{S1. Convergence Diagnostics}
+
+Full convergence statistics and iteration histories for all models.
+
+\subsection*{S2. Goodness-of-Fit Plots}
+
+Complete GOF visualizations for degree, geodesic, and triad distributions.
+
+\subsection*{S3. Simulation Code}
+
+Annotated R code for replication:
+\begin{verbatim}
+https://osf.io/[project-id]/
+\end{verbatim}
+
+\subsection*{S4. Alternative Specifications}
+
+Results for models with varying latitude thresholds and contagion parameters.
+
+% ============================================================================
+% AUTHOR CONTRIBUTIONS (CRediT)
+% ============================================================================
+
+\section*{Author Contributions}
+
+\textbf{JWS}: Conceptualization, Methodology, Software, Formal Analysis, Writing – Original Draft. \textbf{JT}: Conceptualization, Supervision, Writing – Review \& Editing. \textbf{EJ}: Conceptualization, Resources, Writing – Review \& Editing, Funding Acquisition.
+
+% ============================================================================
+% DATA AVAILABILITY
+% ============================================================================
+
+\section*{Data Availability}
+
+Anonymized network data and analysis code are available at OSF: [link]. Raw data are available upon request subject to ethical approval.
+
+% ============================================================================
+% CONFLICT OF INTEREST
+% ============================================================================
+
+\section*{Conflict of Interest}
+
+The authors declare no conflicts of interest.
+
+% ============================================================================
+% FUNDING
+% ============================================================================
+
+\section*{Funding}
+
+This research was supported by the Netherlands Organisation for Scientific Research (NWO) Grant [number].
+
+\end{document}

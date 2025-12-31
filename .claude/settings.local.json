@@ -1,11 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\Rscript.exe\" -e \"install.packages(c(''ggplot2'', ''ggdist'', ''ggraph'', ''tidygraph'', ''ggtext'', ''gganimate'', ''sf'', ''tmap'', ''vdiffr'', ''ggh4x'', ''ggforce'', ''ggnewscale'', ''patchwork'', ''tidyverse'', ''targets'', ''quarto''), repos=''https://cloud.r-project.org'', dependencies=TRUE)\")",
-      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\Rscript.exe\" -e \"install.packages(''ggplot2'', repos=''https://cloud.r-project.org'')\")",
-      "WebFetch(domain:ggplot2.tidyverse.org)",
-      "Bash(git config:*)",
-      "Bash(git add:*)"
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\Rscript.exe\" \"C:\\Users\\Nouri\\Documents\\GitHub\\ABM R\\R\\simple_attraction_repulsion.R\")",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\x64\\Rscript.exe\" -e \"print(''Hello R'')\")"
     ],
     "deny": [],
     "ask": []
